@@ -1,10 +1,19 @@
-// /middlewares/validation.js
 const { body, validationResult } = require('express-validator');
 
 const eventValidationRules = () => [
-    body('title').isString().isLength({ max: 50 }).withMessage('Title is required and should be 50 characters max.'),
-    body('date').isDate({ min: new Date().toISOString() }).withMessage(`Date must be a future date. ${new Date().toDateString()}`),
-    body('location').isString().isLength({ max: 100 }).withMessage('Location is required and should be 100 characters max.'),
+    body('title')
+        .isString().withMessage('Title must be a string.')
+        .notEmpty().withMessage('Title is required.')
+        .isLength({ max: 50 }).withMessage('Title should be 50 characters max.'),
+
+    body('date')
+        .isISO8601().withMessage('Date must be in a valid format (YYYY-MM-DD).')
+        .custom((value) => new Date(value) > new Date()).withMessage('Date must be a future date.'),
+
+    body('location')
+        .isString().withMessage('Location must be a string.')
+        .notEmpty().withMessage('Location is required.')
+        .isLength({ max: 100 }).withMessage('Location should be 100 characters max.'),
 ];
 
 const validate = (req, res, next) => {
